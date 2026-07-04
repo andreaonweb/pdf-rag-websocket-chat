@@ -1,0 +1,20 @@
+<div class="message-list">
+  @for (message of messages(); track message.timestamp.getTime() + message.text) {
+    <div
+      class="message-list__bubble"
+      [class.message-list__bubble--user]="message.role === 'user'"
+      [class.message-list__bubble--assistant]="message.role === 'assistant'"
+    >
+      <p class="message-list__text">{{ message.text }}</p>
+      <span class="message-list__time">{{ message.timestamp | date: 'HH:mm' }}</span>
+    </div>
+  }
+
+  @if (isWaitingForResponse()) {
+    <div class="message-list__bubble message-list__bubble--assistant message-list__bubble--typing">
+      <span class="message-list__dot"></span>
+      <span class="message-list__dot"></span>
+      <span class="message-list__dot"></span>
+    </div>
+  }
+</div>
