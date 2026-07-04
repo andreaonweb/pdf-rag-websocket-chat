@@ -1,0 +1,6 @@
+pypdf
+tiktoken
+sentence-transformers
+qdrant-client>=1.9
+websockets
+ollama
