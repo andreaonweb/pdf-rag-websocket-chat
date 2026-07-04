@@ -1,0 +1,54 @@
+@use '../../../../styles/variables' as *;
+
+.message-input {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: $color-surface;
+  border-top: 1px solid $color-border;
+
+  &__field {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid $color-border;
+    background-color: $color-background;
+    color: $color-text-primary;
+    font-family: $font-body;
+    font-size: 1rem;
+
+    &::placeholder {
+      color: $color-text-secondary;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-accent-primary;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: $color-accent-primary;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}

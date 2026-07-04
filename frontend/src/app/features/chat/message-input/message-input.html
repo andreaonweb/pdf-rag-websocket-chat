@@ -1,0 +1,18 @@
+<form class="message-input" (ngSubmit)="submit()">
+  <input
+    type="text"
+    class="message-input__field"
+    [(ngModel)]="questionText"
+    name="question"
+    placeholder="Escribe tu pregunta sobre el PDF..."
+    [disabled]="disabled()"
+    autocomplete="off"
+  />
+  <button
+    type="submit"
+    class="message-input__button"
+    [disabled]="disabled() || !questionText.trim()"
+  >
+    Enviar
+  </button>
+</form>
