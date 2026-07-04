@@ -1,19 +1,19 @@
-# PDF RAG WebSocket Chat
+# PDF RAG WebSocket Chat — Backend
 
-Chat en tiempo real por websockets que responde preguntas sobre el contenido de un PDF,
-usando RAG (Retrieval Augmented Generation). Todo el pipeline es gratis y corre en local:
-sin API keys, sin servicios de pago.
+Real-time websocket chat that answers questions about the contents of a PDF using RAG
+(Retrieval Augmented Generation). The whole pipeline is free and runs locally: no API keys,
+no paid services.
 
-## Requisitos previos
+## Prerequisites
 
 1. Python 3.10+
-2. [Ollama](https://ollama.com/download) instalado (gratis)
-3. El modelo de Ollama descargado una vez:
+2. [Ollama](https://ollama.com/download) installed (free)
+3. The Ollama model pulled once:
    ```
    ollama pull llama3.2
    ```
 
-## Instalación
+## Installation
 
 ```
 cd backend
@@ -22,72 +22,86 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Uso
+## Usage
 
-1. Coloca tu PDF en la carpeta `data/` (ya debería haber uno ahí).
-2. Ejecuta la ingesta una vez (extrae texto, trocea, genera embeddings, guarda en Qdrant):
+1. Put your PDF in the `data/` folder (there should already be one there).
+2. Run ingestion once (extracts text, chunks it, generates embeddings, stores them in
+   Qdrant):
    ```
    python ingest.py
    ```
-   En un PDF grande (probado con uno de 1608 páginas) la extracción tarda segundos, pero
-   generar los embeddings de todos los chunks puede tardar 10-15 minutos en CPU — es
-   normal, no es que se haya colgado.
-3. Levanta el servidor de chat:
+   On a large PDF (tested with a 1608-page book) extraction takes seconds, but generating
+   embeddings for every chunk can take 10-15 minutes on CPU — that's expected, not a hang.
+3. Start the chat server:
    ```
    python server.py
    ```
-4. Conéctate con cualquier cliente websocket a `ws://localhost:8765` y envía preguntas sobre
-   el contenido del PDF como mensajes de texto. Ejemplo rápido de cliente de prueba:
+4. Connect with any websocket client to `ws://localhost:8765` and send questions about the
+   PDF's content as plain text messages. Quick test client:
    ```
    python -c "
    import asyncio, websockets
 
    async def test():
        async with websockets.connect('ws://localhost:8765') as ws:
-           await ws.send('tu pregunta aqui')
+           await ws.send('your question here')
            print(await ws.recv())
 
    asyncio.run(test())
    "
    ```
 
-## Arquitectura
+**Response time:** expect roughly 30-90 seconds per answer when running Ollama on CPU
+only (no GPU). The pipeline itself (embedding the question, searching Qdrant) is fast —
+the LLM generation step is what takes most of that time. This is normal, not a bug.
 
-Ver `docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md` para el diseño
-completo, y `docs/superpowers/plans/2026-07-04-pdf-rag-websocket-chat.md` para el plan de
-implementación paso a paso.
+## Architecture
 
-Resumen: `ingest.py` (Fase 1, offline) extrae el texto del PDF con **PyMuPDF**, lo trocea,
-cuenta tokens con `tiktoken`, genera un embedding por chunk con un modelo **multilingüe**
-de `sentence-transformers` y lo guarda en una colección de Qdrant embebida
-(`qdrant_storage/`, sin Docker). `server.py` (Fase 2) escucha conexiones websocket; cada
-pregunta se convierte en embedding con el mismo modelo, se buscan los chunks más relevantes
-en Qdrant, y se construye un prompt que se envía a un modelo local de Ollama (`llama3.2`)
-para generar la respuesta final.
+See
+[`docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md`](../docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md)
+for the full design, and
+[`docs/superpowers/plans/2026-07-04-pdf-rag-websocket-chat.md`](../docs/superpowers/plans/2026-07-04-pdf-rag-websocket-chat.md)
+for the step-by-step implementation plan.
 
-### Decisiones tomadas durante la implementación (y por qué)
+Summary: `ingest.py` (Phase 1, offline) extracts the PDF's text with **PyMuPDF**, chunks it,
+counts tokens with `tiktoken`, generates one embedding per chunk with a **multilingual**
+`sentence-transformers` model, and stores everything in an embedded Qdrant collection
+(`qdrant_storage/`, no Docker required). `server.py` (Phase 2) listens for websocket
+connections; each question is embedded with the same model, the most relevant chunks are
+retrieved from Qdrant, and a prompt combining those chunks with the question is sent to a
+local Ollama model (`llama3.2`) to generate the final answer.
 
-- **Extracción de PDF: PyMuPDF, no pypdf ni pdfplumber.** Se probaron los tres contra el PDF
-  real (1608 páginas). `pypdf` insertaba espacios erróneos dentro de palabras
-  (`"pronom inales"` en vez de `"pronominales"`) de forma silenciosa. `pdfplumber` extraía
-  texto limpio pero tardaba ~15 minutos en las 1608 páginas. `PyMuPDF` tarda ~11 segundos
-  (mismo orden de ruido ocasional que pypdf) — para un proyecto de práctica, la velocidad
-  compensa el pequeño ruido cosmético.
-- **Embeddings: modelo multilingüe, no `all-MiniLM-L6-v2`.** El modelo inicial (pensado
-  sobre todo para inglés) daba resultados de similitud semántica invertidos en español
-  (una frase sobre un coche resultaba "más parecida" a una sobre un gato que otra frase
-  sobre un felino). Se cambió a `paraphrase-multilingual-MiniLM-L12-v2`, que sí captura
-  correctamente la semántica en español y mantiene la misma dimensión de vector (384).
-- El texto en español a veces se ve como `�` en la consola de Windows al imprimir — es solo
-  un problema de la consola mostrando Unicode, no un problema real de los datos (se verificó
-  leyendo los caracteres por su código de punto Unicode).
-- Puede aparecer una traza de excepción cosmética al final de scripts cortos
-  (`ModuleNotFoundError: import of msvcrt halted...` desde el `__del__` de `QdrantClient`).
-  Es un artefacto conocido del cierre del intérprete en Windows y no afecta el código de
-  salida del proceso ni los resultados.
+### Decisions made during implementation (and why)
 
-## Notas
+- **PDF extraction: PyMuPDF, not pypdf or pdfplumber.** All three were tested against the
+  real PDF (1608 pages). `pypdf` silently inserted stray spaces inside words
+  (`"pronom inales"` instead of `"pronominales"`). `pdfplumber` extracted clean text but
+  took ~15 minutes for 1608 pages. `PyMuPDF` takes ~11 seconds (with the same order of
+  occasional noise as `pypdf`) — for a practice project, the speed is worth the small
+  cosmetic noise.
+- **Embeddings: a multilingual model, not `all-MiniLM-L6-v2`.** The initial model (aimed
+  mostly at English) produced inverted semantic similarity on Spanish text (a sentence
+  about a car scored as "more similar" to a sentence about a cat than another sentence
+  about a feline did). Switched to `paraphrase-multilingual-MiniLM-L12-v2`, which correctly
+  captures Spanish semantics and keeps the same vector dimension (384).
+- **The RAG call runs in a worker thread (`asyncio.to_thread`), not inline in the
+  websocket handler.** `answer_question()` is blocking (embeddings, Qdrant, and the Ollama
+  call are all synchronous). Running it directly inside the `async` handler froze the
+  event loop for the whole duration, so the client's keepalive ping never got a pong and
+  `websockets` dropped the connection with "keepalive ping timeout". Wrapping the call in
+  `asyncio.to_thread(...)` keeps the event loop free to answer pings while the blocking
+  work happens off-loop.
+- Spanish text sometimes shows up as `�` when printed in a Windows console — that's just
+  the console failing to render Unicode, not an actual data problem (verified by reading
+  the characters' Unicode code points directly).
+- A cosmetic exception trace can appear at the end of short scripts
+  (`ModuleNotFoundError: import of msvcrt halted...` from `QdrantClient.__del__`). It's a
+  known Windows interpreter-shutdown artifact and doesn't affect the process's exit code or
+  results.
 
-- Nada de este proyecto llama a una API de pago. La generación de respuestas corre en tu
-  máquina vía Ollama.
-- El PDF original no se sube a git (ver `.gitignore`) — solo el código y la configuración.
+## Notes
+
+- Nothing in this project calls a paid API. Answer generation runs on your own machine via
+  Ollama.
+- The source PDF itself is not committed to git (see `.gitignore`) — only code and
+  configuration are tracked.

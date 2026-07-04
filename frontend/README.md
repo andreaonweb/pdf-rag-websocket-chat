@@ -1,37 +1,47 @@
-# Frontend — Chat con el PDF
+# Frontend — PDF Chat UI
 
-Interfaz Angular para chatear con el pipeline RAG del backend por websocket.
+Angular chat interface for talking to the backend's RAG pipeline over websockets.
 
-## Requisitos
+## Prerequisites
 
-- Node.js 18+ y npm.
-- El backend corriendo (ver `../backend/README.md`) — necesita el PDF ya ingerido y
-  `python server.py` escuchando en `ws://localhost:8765`.
+- Node.js 18+ and npm.
+- The backend running (see [`../backend/README.md`](../backend/README.md)) — it needs the
+  PDF already ingested and `python server.py` listening on `ws://localhost:8765`.
 
-## Instalación y arranque
+## Install and run
 
 ```
 npm install
 npx ng serve
 ```
 
-Abre `http://localhost:4200`. El punto de estado en la cabecera indica si hay conexión con
-el servidor websocket del backend.
+Open `http://localhost:4200`. The status dot in the header shows whether there's an active
+connection to the backend's websocket server.
 
-## Estructura
+**Response time:** the backend can take roughly 30-90 seconds per answer when Ollama runs
+on CPU only. The "typing..." indicator stays visible the whole time — that's expected, not
+a stuck connection.
 
-- `src/app/core/websocket/` — servicio (`ChatWebsocket`) que envuelve la conexión websocket
-  nativa.
-- `src/app/features/chat/` — componentes de la pantalla de chat (`ChatPage`, `MessageList`,
+## Structure
+
+- `src/app/core/websocket/` — `ChatWebsocket`, the service wrapping the native websocket
+  connection.
+- `src/app/features/chat/` — the chat screen's components (`ChatPage`, `MessageList`,
   `MessageInput`).
-- `src/app/shared/models/` — el modelo `ChatMessage`.
-- `src/styles/` — tokens de color y tipografía, reset global.
-- `src/config/websocket.config.ts` — URL del servidor websocket.
+- `src/app/shared/models/` — the `ChatMessage` model.
+- `src/styles/` — color and typography tokens, global reset.
+- `src/config/websocket.config.ts` — the websocket server URL.
 
-## Nota sobre convenciones de nombres
+## Visual design
 
-Este proyecto usa Angular 21 (vía `@angular/cli@21`, elegido porque la versión `latest`
-requería una versión de Node más reciente de la instalada). Angular 21 eliminó el sufijo de
-tipo en los nombres de archivo y clase (`chat-page.ts` + `class ChatPage`, no
-`chat-page.component.ts` + `class ChatPageComponent`); todo el código de este proyecto sigue
-esa convención de forma consistente.
+Dark theme: black background (`#0a0a0a`), amber/gold accent (`#e0a458`) for the assistant
+and buttons, muted teal accent (`#4a8f8c`) for the user's own messages. Headings and UI
+chrome use **Space Grotesk**; message text uses **Inter** for readability on long answers.
+
+## Naming convention note
+
+This project uses Angular 21 (via `@angular/cli@21`, chosen because the `latest` CLI
+version required a newer Node.js than the one installed on the dev machine). Angular 21
+dropped the type suffix from generated file and class names (`chat-page.ts` +
+`class ChatPage`, not `chat-page.component.ts` + `class ChatPageComponent`); every
+hand-written file in this project follows that same convention for consistency.

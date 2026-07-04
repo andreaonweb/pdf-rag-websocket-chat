@@ -1,20 +1,27 @@
 # PDF RAG WebSocket Chat
 
-Monorepo con dos partes:
+A real-time chat that answers questions about the contents of a PDF using RAG (Retrieval
+Augmented Generation). Every part of the pipeline runs free and local: no paid APIs, no
+cloud services, no API keys.
 
-- **`backend/`** — pipeline RAG en Python (extracción de PDF, chunking, embeddings,
-  Qdrant, servidor websocket, Ollama). Ver `backend/README.md` para instrucciones.
-- **`frontend/`** — chat en Angular para probar el backend desde el navegador. Ver
-  `frontend/README.md` para instrucciones.
+This is a monorepo with two parts:
 
-## Arranque rápido
+- **[`backend/`](backend/README.md)** — Python RAG pipeline: PDF text extraction, chunking,
+  token counting, embeddings, a local Qdrant vector store, and a websocket server that ties
+  it all together with a local Ollama model.
+- **[`frontend/`](frontend/README.md)** — an Angular chat UI to talk to the backend from a
+  browser instead of raw scripts.
 
-1. Backend: sigue `backend/README.md` (instalar dependencias, ingerir el PDF, levantar
-   `python server.py`).
-2. Frontend: sigue `frontend/README.md` (`npm install`, `ng serve`).
-3. Abre `http://localhost:4200` y chatea con el PDF.
+## Quick start
 
-## Documentación de diseño
+1. **Backend** — follow [`backend/README.md`](backend/README.md): install dependencies,
+   ingest your PDF once, then start `python server.py`.
+2. **Frontend** — follow [`frontend/README.md`](frontend/README.md): `npm install`, then
+   `npx ng serve`.
+3. Open `http://localhost:4200` and start chatting with your PDF.
 
-- `docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md` — diseño del backend.
-- `docs/superpowers/specs/2026-07-04-angular-chat-frontend-design.md` — diseño del frontend.
+## Design documentation
+
+- [`docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md`](docs/superpowers/specs/2026-07-04-pdf-rag-websocket-chat-design.md) — backend design.
+- [`docs/superpowers/specs/2026-07-04-angular-chat-frontend-design.md`](docs/superpowers/specs/2026-07-04-angular-chat-frontend-design.md) — frontend design.
+- [`docs/superpowers/plans/`](docs/superpowers/plans/) — the step-by-step implementation plans for both.
