@@ -1,59 +1,37 @@
-# Frontend
+# Frontend — Chat con el PDF
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.6.
+Interfaz Angular para chatear con el pipeline RAG del backend por websocket.
 
-## Development server
+## Requisitos
 
-To start a local development server, run:
+- Node.js 18+ y npm.
+- El backend corriendo (ver `../backend/README.md`) — necesita el PDF ya ingerido y
+  `python server.py` escuchando en `ws://localhost:8765`.
 
-```bash
-ng serve
+## Instalación y arranque
+
+```
+npm install
+npx ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre `http://localhost:4200`. El punto de estado en la cabecera indica si hay conexión con
+el servidor websocket del backend.
 
-## Code scaffolding
+## Estructura
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- `src/app/core/websocket/` — servicio (`ChatWebsocket`) que envuelve la conexión websocket
+  nativa.
+- `src/app/features/chat/` — componentes de la pantalla de chat (`ChatPage`, `MessageList`,
+  `MessageInput`).
+- `src/app/shared/models/` — el modelo `ChatMessage`.
+- `src/styles/` — tokens de color y tipografía, reset global.
+- `src/config/websocket.config.ts` — URL del servidor websocket.
 
-```bash
-ng generate component component-name
-```
+## Nota sobre convenciones de nombres
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Este proyecto usa Angular 21 (vía `@angular/cli@21`, elegido porque la versión `latest`
+requería una versión de Node más reciente de la instalada). Angular 21 eliminó el sufijo de
+tipo en los nombres de archivo y clase (`chat-page.ts` + `class ChatPage`, no
+`chat-page.component.ts` + `class ChatPageComponent`); todo el código de este proyecto sigue
+esa convención de forma consistente.

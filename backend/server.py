@@ -22,7 +22,12 @@ async def handler(websocket) -> None:
         if not question:
             continue
         try:
-            answer = answer_question(question, store)
+            # answer_question() is blocking (embeddings, Qdrant, Ollama call).
+            # Running it inline would freeze the event loop for the whole
+            # duration, so the client's keepalive ping never gets a pong and
+            # websockets drops the connection ("keepalive ping timeout").
+            # asyncio.to_thread() runs it off-loop so pings keep flowing.
+            answer = await asyncio.to_thread(answer_question, question, store)
         except Exception as exc:
             answer = f"Error al generar la respuesta: {exc}"
         await websocket.send(answer)
