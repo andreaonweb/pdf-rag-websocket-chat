@@ -1,4 +1,4 @@
-pypdf
+pymupdf
 tiktoken
 sentence-transformers
 qdrant-client>=1.9
