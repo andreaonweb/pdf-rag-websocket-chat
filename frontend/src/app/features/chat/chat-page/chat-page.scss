@@ -1,0 +1,47 @@
+@use '../../../../styles/variables' as *;
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $color-background;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    color: $color-text-primary;
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: $font-heading;
+    font-size: 0.85rem;
+    color: $color-text-secondary;
+  }
+
+  &__status-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: $color-accent-primary;
+
+    &--connected {
+      background-color: $color-status-connected;
+    }
+
+    &--disconnected {
+      background-color: $color-status-disconnected;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+<div class="chat-page">
+  <header class="chat-page__header">
+    <h1 class="chat-page__title">Chat con el PDF</h1>
+    <div class="chat-page__status">
+      <span
+        class="chat-page__status-dot"
+        [class.chat-page__status-dot--connected]="connectionStatus() === 'connected'"
+        [class.chat-page__status-dot--disconnected]="connectionStatus() === 'disconnected'"
+      ></span>
+      @switch (connectionStatus()) {
+        @case ('connected') {
+          <span>Conectado</span>
+        }
+        @case ('disconnected') {
+          <span>Sin conexión con el servidor</span>
+        }
+        @default {
+          <span>Conectando...</span>
+        }
+      }
+    </div>
+  </header>
+
+  <app-message-list [messages]="messages()" [isWaitingForResponse]="isWaitingForResponse()" />
+
+  <app-message-input [disabled]="connectionStatus() !== 'connected'" (send)="onSend($event)" />
+</div>
