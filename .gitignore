@@ -1,6 +1,8 @@
-qdrant_storage/
-data/*.pdf
-__pycache__/
+backend/qdrant_storage/
+backend/data/*.pdf
+backend/.venv/
+**/__pycache__/
 *.pyc
-.venv/
-venv/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
