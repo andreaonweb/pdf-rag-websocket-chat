@@ -106,3 +106,8 @@ User asks a question over websocket
 
 See [`backend/README.md`](backend/README.md) and [`frontend/README.md`](frontend/README.md)
 for the full write-up of each decision.
+
+## 📫 Contact
+
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:andreaonweb.dev@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/andreaoliveraromero/)
