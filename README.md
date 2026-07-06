@@ -8,6 +8,10 @@ cloud services, no API keys required.
 This is a practice/learning project built as the second part of a websockets class
 exercise: first a plain real-time chat, then extended into a full RAG pipeline.
 
+## ✨ Screenshots
+<img width="1892" height="657" alt="image" src="https://github.com/user-attachments/assets/dc54cc80-3275-4d4d-8798-ec3c3eae3f39" />
+
+
 ## ✨ Features
 
 - 📑 Extracts text from any PDF and splits it into overlapping chunks
